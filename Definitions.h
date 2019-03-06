@@ -1,11 +1,12 @@
 #ifndef DEFS_H
 #define DEFS_H
 
-typedef unsigned long long UNS64;		// Defined an unsigned 64 bit int
+#include <stdio.h>
+#include <stdlib.h>
 
 #define GAMENAME "Chess120"				// Name of program
-#define BRD_SZ 120						// Size of board array
-
+#define VRTBRD_SZ 120					// Size of virtual board array
+#define CHSBRD_SZ 64					// Size of a chess board
 #define MAXGAMEMOVES 2048				// Maximum number of moves for the game
 
 // Define Boolean Conditions
@@ -41,25 +42,49 @@ enum {
 // Enumerated refereing to a 4 bit sequence
 enum {wKING_CA = 1, wQUEEN_CA = 2, bKING_CA = 4, bQUEEN_CA = 8};
 
+// Defined an unsigned 64 bit int
+typedef unsigned long long UNS64;
+
+	/* STRUCTURES */
+
+// Define structure to allow undoing a move
+typedef struct {
+
+	int move;				// To hold the move
+	int castleConditions;	// To hold castle condition
+	int enPassant;			// To hold En Passant condition
+	int fiftyMove;			// To hold Fifty Move condition
+
+	// 
+	UNS64 posKey;			// ...
+
+} UNDO_STR;
+
 // Define our board structure
 typedef struct {
-	// Track board
-	int pieces[BRD_SZ];		// To track piece loactions on the virtual board
-	UNS64 pawns[3];			// 3 array elements to represent pawns of WHITE, BLACK, and BOTH
-							// Each array element is 64 bits, each bit represents a board square
-							// The 8x8 board is represented by 8 sequences of 8 bits, one for each board rank
 
 	// Track pieces
+	int pieces[VRTBRD_SZ];	// To track piece loactions on the virtual board
 	int pieceNum[13];		// Number of pieces on the board for each piece
 	int bigPieceNum[3];		// Number of non-pawn pieces on the board by color
 	int majorPieceNum[3];	// Number of Rooks and Queens on the board by color
 	int minorPieceNum[3];	// Number of Knights and Bishops on the board by color
 	int KingPos[2];			// To record positions of White and Black Kings
+	UNS64 pawns[3];			// 3 array elements to represent pawns of WHITE, BLACK, and BOTH
+							// Each array element is 64 bits, each bit represents a board square
+							// The 8x8 board is represented by 8 sequences of 8 bits, one for each board rank
+
+		// piece list to track pieces, 13 pieces and up to 10 of each
+		// ex. pieceList[wKNIGHT][0] = E1;
+	int pieceList[13][10];
 
 	// Track play and history
 	int side;				// Current side to play
 	int ply;				// To store number of half-moves for search
 	int histPly;			// Total number of half-moves so far
+
+	// Struct array to hold game history
+	UNDO_STR history[MAXGAMEMOVES];
 
 	// Track rules
 	int enPassant;			// To test for En Passant rule conditions
@@ -69,11 +94,7 @@ typedef struct {
 	// 
 	UNS64 posKey;				// ...
 
-} BOARD_STRUCT;
-
-// Define move history structure
-//...
-
+} BOARD_STR;
 
 
 #endif
